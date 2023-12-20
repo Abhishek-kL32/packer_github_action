@@ -1,0 +1,40 @@
+---
+name: "Simple Github Actions Workflow"
+
+on:
+  push:
+    branches:
+      - master
+      - testing
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      packer_version: "1.9.4"
+      AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.REGION }}
+
+
+    steps:
+
+      - name: "Checkout my repo"
+        uses: actions/checkout@v3
+
+      - name: "packer installation"
+        uses: hashicorp/setup-packer@main
+        with:
+          version: ${{ env.packer_version }}
+
+      - name: "packer init"
+        run: packer init .
+        working-directory: ./packer/
+
+      - name: "packer validate"
+        run: packer validate .
+        working-directory: ./packer/
+
+      - name: "packer build"
+        run: packer build .
+        working-directory: ./packer/
